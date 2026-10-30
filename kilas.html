@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KILAS — Kanal Informasi & Layanan Aspirasi SMANERA</title>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            heading: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Smooth Scroll Behavior */
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF9F6;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FAF9F6] text-slate-800 font-sans flex flex-col selection:bg-blue-200 selection:text-blue-900">
+
+  <!-- ============================================================================ -->
+  <!-- CONFIGURATION / ASSETS (GANTI LOGO & FOTO PENGURUS DI SINI)                  -->
+  <!-- ============================================================================ -->
+  <script>
+    // 1. URL Logo KILAS (Masukkan URL logo buatan Anda di sini, atau kosongkan "" untuk fallback)
+    const KILAS_LOGO_URL = ""; 
+
+    // 2. URL Google Form Resmi MPK
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/";
+
+    // 3. Password Admin Moderasi MPK
+    const ADMIN_PASSWORD = "mpk20272028smanera123";
+  </script>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 hidden transition-all">
+    <div class="bg-[#172554] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-blue-400/30">
+      <i data-lucide="sparkles" class="w-5 h-5 text-blue-400"></i>
+      <span id="toast-message" class="text-sm font-medium"></span>
+      <button onclick="hideToast()" class="ml-2 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================================ -->
+  <!-- STICKY NAVIGATION BAR                                                        -->
+  <!-- ============================================================================ -->
+  <nav class="sticky top-0 z-40 bg-[#FAF9F6]/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo Header -->
+        <div onclick="navigateTo('home')" class="flex items-center gap-3 cursor-pointer group">
+          <div id="nav-logo-box">
+            <!-- Rendered by JS -->
+          </div>
+          <div>
+            <span class="text-xl font-extrabold tracking-tight text-[#172554] font-heading block leading-none">
+              KILAS
+            </span>
+            <span class="text-[10px] text-slate-500 font-medium uppercase tracking-wider block mt-1">
+              Aspirasi Suara SMANERA
+            </span>
+          </div>
+        </div>
+
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center gap-1 lg:gap-2">
+          <button onclick="navigateTo('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-colors">Home</button>
+          <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-colors">Dashboard</button>
+          <button onclick="navigateTo('bulletin')" id="nav-bulletin" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-colors">Bulletin Board</button>
+          <button onclick="navigateTo('about')" id="nav-about" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition-colors">About MPK & KILAS</button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="hidden md:flex items-center gap-3">
+          <button onclick="navigateTo('admin')" class="p-2 rounded-lg text-slate-500 hover:text-[#172554] hover:bg-slate-100 transition-colors" title="Portal MPK Admin">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </button>
+          <button onclick="navigateTo('dashboard')" class="bg-[#172554] hover:bg-[#3B82F6] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
+            Masuk ke KILAS
+          </button>
+        </div>
+
+        <!-- Mobile Hamburger Button -->
+        <div class="md:hidden flex items-center">
+          <button onclick="toggleMobileMenu()" class="p-2 rounded-lg text-slate-600 hover:text-[#172554] focus:outline-none">
+            <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-[#FAF9F6] border-b border-slate-200 px-4 pt-2 pb-6 space-y-2">
+      <button onclick="navigateTo('home'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-blue-50">Home</button>
+      <button onclick="navigateTo('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-blue-50">Dashboard</button>
+      <button onclick="navigateTo('bulletin'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-blue-50">Bulletin Board</button>
+      <button onclick="navigateTo('about'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-blue-50">About MPK & KILAS</button>
+      <button onclick="navigateTo('admin'); toggleMobileMenu()" class="block w-full text-left px-4 py-2.5 rounded-lg text-base font-semibold text-slate-700 hover:bg-blue-50">Portal Admin MPK</button>
+      <button onclick="navigateTo('dashboard'); toggleMobileMenu()" class="w-full bg-[#172554] text-white py-3 rounded-xl font-semibold text-center block shadow">Masuk ke KILAS</button>
+    </div>
+  </nav>
+
+  <!-- ============================================================================ -->
+  <!-- MAIN CONTENT AREA                                                            -->
+  <!-- ============================================================================ -->
+  <main class="flex-grow">
+
+    <!-- PAGE 1: HOMEPAGE / LANDING PAGE -->
+    <section id="page-home" class="page-section space-y-24 pb-16">
+      
+      <!-- HERO SECTION -->
+      <div class="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            <div class="lg:col-span-7 space-y-6 text-left">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-[#172554] text-xs font-bold uppercase tracking-wider">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
+                An Initiative by MPK SMANERA
+              </div>
+
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#172554] tracking-tight leading-[1.1] font-heading">
+                Your Voice, <br />
+                <span class="text-[#3B82F6]">Our Direction.</span>
+              </h1>
+
+              <p class="text-slate-600 text-lg sm:text-xl font-normal leading-relaxed max-w-2xl">
+                Selamat datang di <strong>KILAS</strong> — Kanal Informasi & Layanan Aspirasi SMANERA. Tempat setiap suara didengar, setiap ide dihargai, dan setiap aspirasi menjadi langkah nyata menuju perubahan.
+              </p>
+
+              <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <button onclick="navigateTo('dashboard')" class="bg-[#172554] hover:bg-[#3B82F6] text-white px-8 py-4 rounded-2xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
+                  Explore KILAS
+                  <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+
+                <button onclick="document.getElementById('about-summary').scrollIntoView({ behavior: 'smooth' })" class="bg-white hover:bg-slate-100 text-[#172554] border border-slate-300 px-8 py-4 rounded-2xl font-bold text-base shadow-sm transition-colors text-center">
+                  Learn More
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Visual Deck -->
+            <div class="lg:col-span-5 relative flex justify-center">
+              <div class="w-full max-w-md bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200 shadow-2xl relative space-y-4">
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-red-500 rounded-full border-2 border-white shadow-md z-20"></div>
+
+                <div class="bg-amber-100 p-5 rounded-2xl border border-amber-200 text-amber-950 rotate-1 shadow-sm transition-transform hover:rotate-0">
+                  <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Aspirasi #01</span>
+                    <span class="text-[10px] text-amber-700">Terbaru</span>
+                  </div>
+                  <p class="font-semibold text-sm leading-snug">"Mohon penambahan stopkontak dan perbaikan WiFi di perpustakaan sekolah."</p>
+                  <span class="text-[11px] text-amber-800 mt-2 block font-medium">— Siswa Kelas XI</span>
+                </div>
+
+                <div class="bg-blue-100 p-5 rounded-2xl border border-blue-200 text-blue-950 -rotate-2 shadow-sm transition-transform hover:rotate-0">
+                  <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-blue-800 uppercase tracking-wider">Gagasan #02</span>
+                    <span class="text-[10px] text-blue-700">Dalam Diskusi</span>
+                  </div>
+                  <p class="font-semibold text-sm leading-snug">"Pengadaan bazar kewirausahaan siswa setiap semester."</p>
+                  <span class="text-[11px] text-blue-800 mt-2 block font-medium">— Pengurus MPK</span>
+                </div>
+
+                <div class="bg-emerald-100 p-4 rounded-2xl border border-emerald-200 text-emerald-950 flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold">100% Transparan & Terarah</p>
+                    <p class="text-[11px] text-emerald-800">Dikelola langsung oleh MPK SMANERA</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT SUMMARY -->
+      <div id="about-summary" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 shadow-sm space-y-12">
+          
+          <div class="max-w-3xl space-y-3">
+            <span class="text-xs font-bold text-[#3B82F6] uppercase tracking-widest">Tentang Platform</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-[#172554] font-heading">What is KILAS?</h2>
+            <p class="text-slate-600 text-base sm:text-lg leading-relaxed">
+              KILAS adalah ruang digital resmi yang dibentuk oleh MPK SMANERA untuk menjadi jembatan komunikasi terbuka. Melalui KILAS, setiap siswa memiliki kesempatan penuh untuk menyampaikan pendapat, kritik membangun, saran, maupun gagasan demi mewujudkan SMANERA yang lebih baik.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="p-6 rounded-2xl bg-[#FAF9F6] border border-slate-200/80 space-y-3 hover:border-blue-300 transition-colors">
+              <div class="w-12 h-12 rounded-xl bg-blue-100 text-[#3B82F6] flex items-center justify-center font-bold">
+                <i data-lucide="megaphone" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-[#172554]">Speak Up</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Setiap siswa berhak menyuarakan pendapat dan ide demi kemajuan lingkungan SMANERA.
+              </p>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-[#FAF9F6] border border-slate-200/80 space-y-3 hover:border-blue-300 transition-colors">
+              <div class="w-12 h-12 rounded-xl bg-blue-100 text-[#3B82F6] flex items-center justify-center font-bold">
+                <i data-lucide="pin" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-[#172554]">Be Heard</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Aspirasi yang masuk secara langsung menjadi bahan evaluasi dan perhatian serius bagi pengurus MPK.
+              </p>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-[#FAF9F6] border border-slate-200/80 space-y-3 hover:border-blue-300 transition-colors">
+              <div class="w-12 h-12 rounded-xl bg-blue-100 text-[#3B82F6] flex items-center justify-center font-bold">
+                <i data-lucide="sparkles" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-[#172554]">Make Changes</h3>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Bersama-sama mengubah ide dan usulan menjadi aksi nyata demi kemajuan seluruh siswa SMANERA.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h4 className="text-lg font-bold text-[#172554]">Ready to make your voice count?</h4>
+              <p className="text-xs text-slate-500">Mulai sampaikan gagasasmu atau jelajahi inspirasi dari teman-teman lainnya.</p>
+            </div>
+            <button onclick="navigateTo('dashboard')" class="bg-[#172554] hover:bg-[#3B82F6] text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors shrink-0">
+              Enter KILAS →
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PAGE 2: MAIN DASHBOARD -->
+    <section id="page-dashboard" class="page-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      
+      <div class="bg-gradient-to-r from-[#172554] to-blue-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl relative overflow-hidden">
+        <div class="relative z-10 max-w-2xl space-y-3">
+          <div class="inline-block bg-blue-500/30 text-blue-200 text-xs font-bold px-3 py-1 rounded-full border border-blue-400/30">
+            Welcome to KILAS!
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+            Every voice matters.
+          </h1>
+          <p class="text-blue-100 text-sm sm:text-base leading-relaxed">
+            Pilih kanal penyampaian aspirasi Anda. Gunakan Google Form resmi untuk penyampaian formal, atau bagikan gagasan Anda di Bulletin Board Digital.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Card 1: Google Form -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-[#3B82F6] flex items-center justify-center">
+              <i data-lucide="megaphone" class="w-7 h-7"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-[#172554]">Have Something to Say?</h2>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Punya kritik, saran, ide, atau aspirasi formal untuk SMANERA? Jangan ragu untuk menyuarakannya melalui kanal resmi Google Form MPK SMANERA.
+            </p>
+          </div>
+
+          <a id="btn-gform" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-[#172554] hover:bg-[#3B82F6] text-white py-4 rounded-2xl font-bold text-center block shadow transition-colors text-sm">
+            Send Your Aspiration →
+          </a>
+        </div>
+
+        <!-- Card 2: MPK Bulletin Board -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="pin" class="w-7 h-7"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-[#172554]">What's on the Board?</h2>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Lihat berbagai aspirasi, ide, dan pendapat dari teman-teman SMANERA lainnya dalam papan pengumuman digital yang interaktif.
+            </p>
+          </div>
+
+          <button onclick="navigateTo('bulletin')" class="w-full bg-[#3B82F6] hover:bg-[#172554] text-white py-4 rounded-2xl font-bold text-center block shadow transition-colors text-sm">
+            Explore Bulletin Board →
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Realtime Statistics -->
+      <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-6">
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Realtime Stats</span>
+          <h3 class="text-2xl font-extrabold text-[#172554]">One School, Thousands of Voices.</h3>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+          <div class="p-4 rounded-2xl bg-[#FAF9F6]">
+            <span id="stat-total" class="text-3xl font-extrabold text-[#172554] block">0</span>
+            <span class="text-xs text-slate-500 font-semibold">Total Aspirations</span>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-[#FAF9F6]">
+            <span id="stat-published" class="text-3xl font-extrabold text-blue-600 block">0</span>
+            <span class="text-xs text-slate-500 font-semibold">Published Aspirations</span>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-[#FAF9F6]">
+            <span id="stat-pending" class="text-3xl font-extrabold text-amber-600 block">0</span>
+            <span class="text-xs text-slate-500 font-semibold">In Moderation</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PAGE 3: BULLETIN BOARD -->
+    <section id="page-bulletin" class="page-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
+        <div>
+          <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 uppercase tracking-wider mb-2">
+            <i data-lucide="pin" class="w-4 h-4"></i> MPK Digital Corkboard
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-[#172554] font-heading">The Voice of SMANERA</h1>
+          <p class="text-slate-600 text-sm mt-1">
+            Kumpulan gagasan, ide, dan aspirasi siswa SMANERA.
+          </p>
+        </div>
+
+        <button onclick="openSubmitModal()" class="bg-[#172554] hover:bg-[#3B82F6] text-white px-6 py-3.5 rounded-2xl font-bold text-sm shadow flex items-center justify-center gap-2 transition-colors shrink-0">
+          <i data-lucide="plus" class="w-5 h-5"></i>
+          Pin Your Thoughts
+        </button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="relative max-w-md">
+        <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input 
+          type="text" 
+          id="search-input"
+          oninput="renderBulletinCards()"
+          placeholder="Cari kata kunci aspirasi..." 
+          class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-[#3B82F6] shadow-sm"
+        />
+      </div>
+
+      <!-- Bulletin Corkboard -->
+      <div class="bg-[#e2d5c3] p-6 sm:p-10 rounded-3xl border-4 border-[#b89b72] shadow-inner min-h-[450px]">
+        <div id="bulletin-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PAGE 4: ABOUT MPK & KILAS (6 SLOT STRUKTUR ORGANISASI) -->
+    <section id="page-about" class="page-section hidden px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto py-12 space-y-16">
+      
+      <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider">
+          Tentang Program Kerja & Organisasi
+        </div>
+        <h1 class="text-4xl font-extrabold text-[#172554] font-heading">
+          KILAS & MPK SMANERA
+        </h1>
+        <p class="text-slate-600 text-lg">
+          Membangun Komunikasi Dua Arah yang Transparan, Inklusif, dan Dekat dengan Seluruh Siswa SMANERA.
+        </p>
+      </div>
+
+      <!-- Purpose Section -->
+      <div class="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200 shadow-sm space-y-6 text-slate-700 leading-relaxed">
+        <h2 class="text-2xl font-bold text-[#172554]">About the Initiative</h2>
+        <p>
+          <strong>KILAS (Kanal Informasi & Layanan Aspirasi SMANERA)</strong> merupakan salah satu program kerja utama MPK SMANERA yang dirancang khusus untuk memberikan ruang digital independen bagi seluruh siswa. Kami percaya bahwa setiap perubahan besar berawal dari gagasan sederhana yang berani disuarakan.
+        </p>
+
+        <h2 class="text-2xl font-bold text-[#172554] pt-4">Our Purpose</h2>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+            <span><strong>Meningkatkan Partisipasi Siswa:</strong> Mendorong peran aktif seluruh siswa SMANERA dalam pengawasan dan pembangunan lingkungan sekolah.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+            <span><strong>Jembatan Komunikasi Resmi:</strong> Menjadi saluran aspirasi resmi yang aman, transparan, dan responsif antara siswa dan pihak pengurus MPK.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- MPK Structure Container -->
+      <div class="space-y-8">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <span class="text-xs font-bold text-[#3B82F6] uppercase tracking-widest">Lembaga Legislatif Siswa</span>
+          <h2 class="text-3xl font-extrabold text-[#172554] font-heading">About MPK SMANERA</h2>
+          <p class="text-slate-600 text-sm">
+            Majelis Perwakilan Kelas (MPK) SMANERA adalah perwakilan tertinggi siswa yang memiliki fungsi perancangan aspirasi, pengawasan kinerja OSIS, dan penyusunan regulasi kegiatan siswa di SMA Negeri 1.
+          </p>
+        </div>
+
+        <!-- 6 Structure Slots -->
+        <div class="space-y-6">
+          
+          <!-- Slot 1: Ketua & Wakil (Top) -->
+          <div class="bg-gradient-to-r from-[#172554] to-[#1e3a8a] text-white rounded-3xl p-8 shadow-xl border border-blue-900 flex flex-col gap-6 relative overflow-hidden">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+              <div class="w-16 h-16 rounded-2xl bg-amber-400 text-[#172554] flex items-center justify-center shrink-0 shadow-lg">
+                <i data-lucide="crown" class="w-8 h-8"></i>
+              </div>
+              <div class="space-y-2">
+                <div class="inline-block bg-blue-500/30 text-amber-300 text-[11px] font-bold px-3 py-1 rounded-full border border-amber-400/30">
+                  Pimpinan Tertinggi
+                </div>
+                <h3 class="text-2xl font-extrabold font-heading">Ketua & Wakil Ketua MPK</h3>
+                <p class="text-sm text-blue-100 leading-relaxed pt-1">
+                  Memimpin, mengoordinasikan, dan bertanggung jawab penuh atas seluruh arah kebijakan, pengawasan, dan kegiatan legislatif siswa di MPK SMANERA.
+                </p>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-blue-800/80 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10 flex items-center gap-4">
+                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=300" alt="Ketua MPK" class="w-14 h-14 rounded-xl object-cover border-2 border-amber-400 shrink-0">
+                <div class="text-left">
+                  <h4 class="font-bold text-white text-base leading-snug">Ahmad Rizky</h4>
+                  <p class="text-xs text-amber-300 font-medium">Ketua MPK SMANERA</p>
+                </div>
+              </div>
+              <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/10 flex items-center gap-4">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" alt="Wakil Ketua MPK" class="w-14 h-14 rounded-xl object-cover border-2 border-amber-400 shrink-0">
+                <div class="text-left">
+                  <h4 class="font-bold text-white text-base leading-snug">Siti Nurhaliza</h4>
+                  <p class="text-xs text-amber-300 font-medium">Wakil Ketua MPK SMANERA</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slots 2 & 3: Bendahara & Sekretaris -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Bendahara -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+              <div>
+                <div class="w-12 h-12 bg-blue-50 text-[#3B82F6] rounded-xl flex items-center justify-center mb-4">
+                  <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                </div>
+                <h4 class="text-lg font-bold text-[#172554] mb-1">Bendahara MPK</h4>
+                <span class="text-xs font-semibold text-blue-600 block mb-3">Pengelola Keuangan</span>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                  Mengelola arus kas, penyusunan anggaran, serta transparansi keuangan seluruh kegiatan dan program kerja MPK SMANERA.
+                </p>
+
+                <div class="pt-3 border-t border-slate-100 space-y-2.5">
+                  <div class="flex items-center gap-3 bg-[#FAF9F6] p-2 rounded-xl border border-slate-100">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300" class="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0">
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs leading-tight">Nabila Putri</p>
+                      <p class="text-[10px] text-blue-600 font-semibold">Bendahara I</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 bg-[#FAF9F6] p-2 rounded-xl border border-slate-100">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=300" class="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0">
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs leading-tight">Diva Ananda</p>
+                      <p class="text-[10px] text-blue-600 font-semibold">Bendahara II</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sekretaris -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+              <div>
+                <div class="w-12 h-12 bg-blue-50 text-[#3B82F6] rounded-xl flex items-center justify-center mb-4">
+                  <i data-lucide="file-text" class="w-6 h-6"></i>
+                </div>
+                <h4 class="text-lg font-bold text-[#172554] mb-1">Sekretaris MPK</h4>
+                <span class="text-xs font-semibold text-blue-600 block mb-3">Administrasi & Persuratan</span>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                  Bertanggung jawab atas administrasi, penyusunan notula, arsip dokumen, serta tata kelola persuratan resmi MPK SMANERA.
+                </p>
+
+                <div class="pt-3 border-t border-slate-100 space-y-2.5">
+                  <div class="flex items-center gap-3 bg-[#FAF9F6] p-2 rounded-xl border border-slate-100">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300" class="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0">
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs leading-tight">Farhan Pratama</p>
+                      <p class="text-[10px] text-blue-600 font-semibold">Sekretaris I</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 bg-[#FAF9F6] p-2 rounded-xl border border-slate-100">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=300" class="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0">
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs leading-tight">Aulia Rahma</p>
+                      <p class="text-[10px] text-blue-600 font-semibold">Sekretaris II</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Slots 4, 5, 6: Komisi A, B, C (Large Group Photo Frame) -->
+          <div class="pt-4 space-y-4">
+            <h3 class="text-center font-bold text-[#172554] text-lg">Komisi MPK SMANERA</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 items-center">
+              
+              <!-- Komisi A -->
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col space-y-3">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-extrabold text-[#172554]">Komisi A</h4>
+                  <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Anggota Komisi</span>
+                </div>
+                <div class="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" alt="Komisi A" class="w-full h-56 sm:h-64 object-cover hover:scale-105 transition-transform duration-300">
+                  <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 text-white">
+                    <p class="text-xs font-semibold text-center">Foto Anggota Komisi A SMANERA</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Komisi B -->
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col space-y-3">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-extrabold text-[#172554]">Komisi B</h4>
+                  <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Anggota Komisi</span>
+                </div>
+                <div class="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                  <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=800" alt="Komisi B" class="w-full h-56 sm:h-64 object-cover hover:scale-105 transition-transform duration-300">
+                  <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 text-white">
+                    <p class="text-xs font-semibold text-center">Foto Anggota Komisi B SMANERA</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Komisi C (Centered) -->
+              <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col space-y-3 md:col-span-2 lg:col-span-2 max-w-xl mx-auto w-full">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-extrabold text-[#172554]">Komisi C</h4>
+                  <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Anggota Komisi</span>
+                </div>
+                <div class="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                  <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800" alt="Komisi C" class="w-full h-56 sm:h-64 object-cover hover:scale-105 transition-transform duration-300">
+                  <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 text-white">
+                    <p class="text-xs font-semibold text-center">Foto Anggota Komisi C SMANERA</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PAGE 5: ADMIN DASHBOARD MODERATION -->
+    <section id="page-admin" class="page-section hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      
+      <!-- Admin Password Lock Screen -->
+      <div id="admin-lock" class="max-w-md mx-auto bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6 text-center">
+        <div class="w-16 h-16 bg-blue-50 text-[#172554] rounded-2xl flex items-center justify-center mx-auto">
+          <i data-lucide="shield-check" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-extrabold text-[#172554]">Portal Admin MPK</h2>
+          <p class="text-xs text-slate-500 mt-1">Masukkan kata sandi pengurus untuk mengakses panel moderasi.</p>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+          <input 
+            type="password" 
+            id="admin-password-input"
+            placeholder="Masukkan Kata Sandi..." 
+            class="w-full px-4 py-3 bg-[#FAF9F6] border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#3B82F6]"
+          />
+          <button type="submit" class="w-full bg-[#172554] hover:bg-[#3B82F6] text-white py-3 rounded-xl font-bold text-sm shadow transition-colors">
+            Masuk Portal Admin
+          </button>
+        </form>
+      </div>
+
+      <!-- Admin Panel Screen (Hidden until authenticated) -->
+      <div id="admin-panel" class="hidden space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <h1 class="text-2xl font-extrabold text-[#172554]">Moderasi Aspirasi Siswa</h1>
+            <p class="text-xs text-slate-500">Kelola dan tinjau seluruh aspirasi sebelum dipublikasikan ke Bulletin Board.</p>
+          </div>
+          <button onclick="adminLogout()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl self-start sm:self-auto">
+            Keluar Admin
+          </button>
+        </div>
+
+        <!-- Moderation Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-slate-100 font-bold text-sm text-[#172554]">
+            Daftar Aspirasi Masuk
+          </div>
+
+          <div id="admin-table-container" class="divide-y divide-slate-100 overflow-x-auto">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================================================ -->
+  <!-- MODAL: SUBMIT ASPIRATION FORM                                               -->
+  <!-- ============================================================================ -->
+  <div id="modal-submit" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100 my-8">
+      <button onclick="closeSubmitModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="space-y-1 mb-6">
+        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Bulletin Board Post</span>
+        <h3 class="text-2xl font-extrabold text-[#172554] font-heading">Pin Your Thoughts</h3>
+        <p class="text-xs text-slate-500">Aspirasi akan diperiksa oleh pengurus MPK sebelum dipublikasikan.</p>
+      </div>
+
+      <form onsubmit="handleSubmitAspiration(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Judul Aspirasi *</label>
+          <input type="text" id="form-title" required placeholder="Contoh: Perbaikan Fasilitas Lapangan Olahraga" class="w-full px-4 py-3 bg-[#FAF9F6] border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#3B82F6]" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Isi Aspirasi / Pendapat *</label>
+          <textarea id="form-content" required rows="5" placeholder="Tuliskan gagasan, saran, atau masukan Anda secara rinci dan sopan..." class="w-full px-4 py-3 bg-[#FAF9F6] border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#3B82F6]"></textarea>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-slate-700">Identitas Pengirim</label>
+            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 font-semibold">
+              <input type="checkbox" id="form-anon" checked onchange="toggleAnonInput()" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+              Kirim sebagai Anonim
+            </label>
+          </div>
+
+          <div id="name-input-wrapper" class="hidden">
+            <input type="text" id="form-name" placeholder="Nama / Inisial (Contoh: Budi XI MIPA 2)" class="w-full px-4 py-2.5 bg-[#FAF9F6] border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#3B82F6]" />
+          </div>
+        </div>
+
+        <div class="pt-4 flex gap-3">
+          <button type="button" onclick="closeSubmitModal()" class="w-1/2 py-3 border border-slate-200 rounded-xl text-slate-600 font-bold text-sm hover:bg-slate-50">
+            Batal
+          </button>
+          <button type="submit" id="btn-submit-form" class="w-1/2 py-3 bg-[#172554] hover:bg-[#3B82F6] text-white rounded-xl font-bold text-sm shadow transition-colors">
+            Post to Board
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================================ -->
+  <!-- MODAL: ASPIRATION DETAIL VIEW & REACTIONS                                   -->
+  <!-- ============================================================================ -->
+  <div id="modal-detail" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-slate-100 my-8">
+      <button onclick="closeDetailModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <div class="space-y-4">
+        <div class="flex items-center gap-2">
+          <span id="detail-date" class="text-xs font-bold text-slate-400">Dipublikasikan</span>
+        </div>
+
+        <h3 id="detail-title" class="text-2xl font-extrabold text-[#172554] font-heading">
+          <!-- Title -->
+        </h3>
+
+        <div id="detail-content" class="p-5 rounded-2xl bg-[#FAF9F6] border border-slate-200 text-slate-800 text-sm leading-relaxed whitespace-pre-wrap">
+          <!-- Content -->
+        </div>
+
+        <div class="text-xs font-semibold text-slate-500">
+          Oleh: <span id="detail-author" class="text-slate-800">Siswa SMANERA</span>
+        </div>
+
+        <!-- Reaction Buttons -->
+        <div class="pt-4 border-t border-slate-100 space-y-2">
+          <span class="text-xs font-bold text-slate-700 block">Dukung Aspirasi Ini:</span>
+          <div class="grid grid-cols-3 gap-3">
+            
+            <button onclick="handleReaction('helpful')" class="p-3 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 flex flex-col items-center justify-center transition-colors">
+              <i data-lucide="thumbs-up" class="w-5 h-5 text-blue-600 mb-1"></i>
+              <span class="text-[11px] font-bold">Helpful</span>
+              <span id="react-helpful" class="text-[10px] text-slate-400">0</span>
+            </button>
+
+            <button onclick="handleReaction('support')" class="p-3 rounded-xl border border-slate-200 hover:border-rose-400 hover:bg-rose-50 text-slate-700 flex flex-col items-center justify-center transition-colors">
+              <i data-lucide="heart" class="w-5 h-5 text-rose-500 mb-1"></i>
+              <span class="text-[11px] font-bold">Support</span>
+              <span id="react-support" class="text-[10px] text-slate-400">0</span>
+            </button>
+
+            <button onclick="handleReaction('agree')" class="p-3 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-700 flex flex-col items-center justify-center transition-colors">
+              <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mb-1"></i>
+              <span class="text-[11px] font-bold">I Agree</span>
+              <span id="react-agree" class="text-[10px] text-slate-400">0</span>
+            </button>
+
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="closeDetailModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition-colors">
+            Kembali ke Board
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================================ -->
+  <!-- FOOTER                                                                       -->
+  <!-- ============================================================================ -->
+  <footer class="bg-[#172554] text-white pt-16 pb-12 border-t border-blue-900 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 pb-12 border-b border-blue-900/60">
+        <div class="md:col-span-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <div id="footer-logo-box">
+              <!-- Rendered by JS -->
+            </div>
+            <span class="text-xl font-extrabold tracking-tight font-heading">KILAS</span>
+          </div>
+          <p class="text-sm text-blue-200 max-w-md leading-relaxed">
+            Kanal Informasi & Layanan Aspirasi SMANERA. A Student Voice Platform by MPK SMANERA.
+          </p>
+          <p class="text-xs text-blue-300 font-medium italic">
+            "Small Voices. Meaningful Changes."
+          </p>
+        </div>
+
+        <div class="md:col-span-3 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-blue-400">Quick Nav</h4>
+          <ul class="space-y-2 text-sm text-blue-200">
+            <li><button onclick="navigateTo('home')" class="hover:text-white transition-colors">Home</button></li>
+            <li><button onclick="navigateTo('dashboard')" class="hover:text-white transition-colors">Main Dashboard</button></li>
+            <li><button onclick="navigateTo('bulletin')" class="hover:text-white transition-colors">MPK Bulletin Board</button></li>
+            <li><button onclick="navigateTo('about')" class="hover:text-white transition-colors">About MPK & KILAS</button></li>
+          </ul>
+        </div>
+
+        <div class="md:col-span-3 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-blue-400">Pengurus MPK</h4>
+          <p class="text-sm text-blue-200 leading-relaxed">
+            Majelis Perwakilan Kelas (MPK)<br />
+            SMA Negeri 1
+          </p>
+          <div class="pt-2">
+            <button onclick="navigateTo('admin')" class="text-xs text-blue-300 hover:text-white underline">
+              Portal Moderasi Admin
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center text-xs text-blue-300">
+        Copyright © 2026 KILAS — MPK SMANERA. All Rights Reserved.
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ============================================================================ -->
+  <!-- JAVASCRIPT LOGIC & FIREBASE FIRESTORE BACKEND                                -->
+  <!-- ============================================================================ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      onSnapshot, 
+      doc, 
+      updateDoc, 
+      deleteDoc, 
+      serverTimestamp, 
+      increment 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { 
+      getAuth, 
+      signInAnonymously, 
+      signInWithCustomToken, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+    // Global State
+    window.aspirations = [];
+    window.selectedAsp = null;
+    window.isAdminLoggedIn = false;
+    window.userReactions = {};
+
+    // 1. Firebase Initialization
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+      apiKey: "demo-api-key",
+      authDomain: "demo.firebaseapp.com",
+      projectId: "demo-project",
+      storageBucket: "demo.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:demo"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'kilas-smanera';
+
+    // 2. Auth & Realtime Firestore Snapshot
+    const initApp = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.error("Auth init error:", err);
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+
+        // Fetch aspirations from correct artifact path
+        const aspirationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'aspirations');
+        onSnapshot(aspirationsRef, (snapshot) => {
+          const docs = snapshot.docs.map(docSnap => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          }));
+
+          // Sort descending in memory
+          docs.sort((a, b) => (b.created_at?.seconds || 0) - (a.created_at?.seconds || 0));
+          window.aspirations = docs;
+
+          // Re-render UI
+          renderBulletinCards();
+          updateStats();
+          renderAdminTable();
+        }, (err) => {
+          console.error("Firestore snapshot error:", err);
+        });
+      });
+    };
+
+    // Global Functions for App
+    window.handleSubmitAspiration = async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('form-title').value.trim();
+      const content = document.getElementById('form-content').value.trim();
+      const isAnon = document.getElementById('form-anon').checked;
+      const nameInput = document.getElementById('form-name').value.trim();
+
+      if (!title || !content) {
+        showToast('Harap isi judul dan isi aspirasi.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-form');
+      btn.disabled = true;
+      btn.innerText = 'Mengirim...';
+
+      try {
+        const aspirationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'aspirations');
+        await addDoc(aspirationsRef, {
+          title,
+          content,
+          display_name: isAnon ? 'Siswa SMANERA (Anonim)' : (nameInput || 'Siswa SMANERA'),
+          is_anonymous: isAnon,
+          status: 'pending',
+          helpful_count: 0,
+          support_count: 0,
+          agree_count: 0,
+          created_at: serverTimestamp()
+        });
+
+        document.getElementById('form-title').value = '';
+        document.getElementById('form-content').value = '';
+        document.getElementById('form-name').value = '';
+        closeSubmitModal();
+        showToast('Aspirasi Anda berhasil dikirim! Menunggu moderasi pengurus MPK.');
+      } catch (err) {
+        console.error("Submit error:", err);
+        showToast('Gagal mengirimkan aspirasi. Silakan coba lagi.');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Post to Board';
+      }
+    };
+
+    window.handleUpdateStatus = async (aspId, newStatus) => {
+      try {
+        const aspDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'aspirations', aspId);
+        await updateDoc(aspDocRef, {
+          status: newStatus,
+          published_at: newStatus === 'published' ? serverTimestamp() : null
+        });
+        showToast(`Status aspirasi berhasil diubah menjadi: ${newStatus}`);
+      } catch (err) {
+        console.error("Update error:", err);
+        showToast('Gagal mengubah status aspirasi.');
+      }
+    };
+
+    window.handleDeleteAspiration = async (aspId) => {
+      if (!confirm('Apakah Anda yakin ingin menghapus aspirasi ini secara permanen?')) return;
+      try {
+        const aspDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'aspirations', aspId);
+        await deleteDoc(aspDocRef);
+        showToast('Aspirasi berhasil dihapus.');
+      } catch (err) {
+        console.error("Delete error:", err);
+        showToast('Gagal menghapus aspirasi.');
+      }
+    };
+
+    window.handleReaction = async (type) => {
+      if (!window.selectedAsp) return;
+      const aspId = window.selectedAsp.id;
+      const key = `${aspId}_${type}`;
+
+      if (window.userReactions[key]) {
+        showToast('Anda sudah memberikan reaksi ini.');
+        return;
+      }
+
+      try {
+        const aspDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'aspirations', aspId);
+        const field = `${type}_count`;
+        await updateDoc(aspDocRef, {
+          [field]: increment(1)
+        });
+
+        window.userReactions[key] = true;
+        
+        // Update local detail view
+        const currentCount = (window.selectedAsp[field] || 0) + 1;
+        window.selectedAsp[field] = currentCount;
+        document.getElementById(`react-${type}`).innerText = currentCount;
+
+        showToast('Reaksi Anda berhasil ditambahkan!');
+      } catch (err) {
+        console.error("Reaction error:", err);
+        showToast('Gagal menambahkan reaksi.');
+      }
+    };
+
+    window.onload = () => {
+      // Set Links
+      document.getElementById('btn-gform').href = GOOGLE_FORM_URL;
+      
+      // Render Logos
+      renderLogos();
+      
+      // Init Firebase
+      initApp();
+
+      // Render Lucide Icons
+      lucide.createIcons();
+    };
+  </script>
+
+  <!-- UI & NAVIGATION SCRIPT -->
+  <script>
+    // Navigation Page Switcher
+    function navigateTo(pageId) {
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(`page-${pageId}`).classList.remove('hidden');
+
+      // Update Nav Buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-[#3B82F6]', 'bg-blue-50');
+        btn.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`nav-${pageId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('text-[#3B82F6]', 'bg-blue-50');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // Render Logos
+    function renderLogos() {
+      const navBox = document.getElementById('nav-logo-box');
+      const footerBox = document.getElementById('footer-logo-box');
+
+      if (KILAS_LOGO_URL) {
+        navBox.innerHTML = `<img src="${KILAS_LOGO_URL}" alt="Logo KILAS" class="w-10 h-10 object-contain rounded-xl shadow-sm" />`;
+        footerBox.innerHTML = `<img src="${KILAS_LOGO_URL}" alt="Logo KILAS" class="w-9 h-9 object-contain rounded-xl bg-white p-1" />`;
+      } else {
+        navBox.innerHTML = `<div class="w-10 h-10 rounded-xl bg-[#172554] flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:bg-[#3B82F6] transition-colors">K</div>`;
+        footerBox.innerHTML = `<div class="w-9 h-9 rounded-xl bg-[#3B82F6] flex items-center justify-center text-white font-bold text-lg">K</div>`;
+      }
+    }
+
+    // Toast Notification
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      document.getElementById('toast-message').innerText = msg;
+      container.classList.remove('hidden');
+      setTimeout(() => hideToast(), 4000);
+    }
+
+    function hideToast() {
+      document.getElementById('toast-container').classList.add('hidden');
+    }
+
+    // Render Bulletin Cards
+    const STICKY_COLORS = [
+      'bg-amber-100 border-amber-200 text-amber-950',
+      'bg-blue-100 border-blue-200 text-blue-950',
+      'bg-rose-100 border-rose-200 text-rose-950',
+      'bg-emerald-100 border-emerald-200 text-emerald-950',
+      'bg-purple-100 border-purple-200 text-purple-950',
+    ];
+    const ROTATIONS = ['rotate-1', '-rotate-1', 'rotate-2', '-rotate-2', 'rotate-0'];
+
+    function renderBulletinCards() {
+      const container = document.getElementById('bulletin-grid');
+      const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+      
+      const published = (window.aspirations || []).filter(a => a.status === 'published');
+      const filtered = published.filter(a => 
+        (a.title || '').toLowerCase().includes(query) || 
+        (a.content || '').toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-20 bg-white/50 rounded-2xl border border-dashed border-slate-400 max-w-md mx-auto p-6">
+            <p class="text-slate-800 font-bold mb-1">Belum ada aspirasi dipublikasikan</p>
+            <p class="text-xs text-slate-600 mb-4">Jadilah yang pertama untuk mengirimkan pendapatmu ke Bulletin Board!</p>
+            <button onclick="openSubmitModal()" class="bg-[#172554] text-white px-4 py-2 rounded-xl text-xs font-bold">+ Tambahkan Aspirasi</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((item, idx) => {
+        const color = STICKY_COLORS[idx % STICKY_COLORS.length];
+        const rot = ROTATIONS[idx % ROTATIONS.length];
+
+        return `
+          <div 
+            onclick="openDetailModal('${item.id}')"
+            class="p-6 rounded-2xl border shadow-md hover:shadow-xl transition-all cursor-pointer relative flex flex-col justify-between min-h-[200px] ${color} ${rot} transform hover:scale-105 hover:z-20"
+          >
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-5 h-5 bg-red-500 rounded-full border-2 border-white shadow"></div>
+            <div>
+              <h3 class="font-extrabold text-base mb-2 leading-snug line-clamp-2">${item.title}</h3>
+              <p class="text-xs leading-relaxed line-clamp-4 font-medium opacity-90">"${item.content}"</p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-black/10 flex items-center justify-between text-[11px] font-semibold opacity-80">
+              <span>${item.display_name}</span>
+              <span class="text-[10px] uppercase tracking-wider font-bold">Detail →</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Stats Counter
+    function updateStats() {
+      const all = window.aspirations || [];
+      document.getElementById('stat-total').innerText = all.length;
+      document.getElementById('stat-published').innerText = all.filter(a => a.status === 'published').length;
+      document.getElementById('stat-pending').innerText = all.filter(a => a.status === 'pending').length;
+    }
+
+    // Modal Helpers
+    function openSubmitModal() {
+      document.getElementById('modal-submit').classList.remove('hidden');
+    }
+    function closeSubmitModal() {
+      document.getElementById('modal-submit').classList.add('hidden');
+    }
+
+    function toggleAnonInput() {
+      const isAnon = document.getElementById('form-anon').checked;
+      const wrapper = document.getElementById('name-input-wrapper');
+      if (isAnon) {
+        wrapper.classList.add('hidden');
+      } else {
+        wrapper.classList.remove('hidden');
+      }
+    }
+
+    function openDetailModal(aspId) {
+      const asp = window.aspirations.find(a => a.id === aspId);
+      if (!asp) return;
+      window.selectedAsp = asp;
+
+      document.getElementById('detail-title').innerText = asp.title;
+      document.getElementById('detail-content').innerText = `"${asp.content}"`;
+      document.getElementById('detail-author').innerText = asp.display_name;
+      
+      document.getElementById('react-helpful').innerText = asp.helpful_count || 0;
+      document.getElementById('react-support').innerText = asp.support_count || 0;
+      document.getElementById('react-agree').innerText = asp.agree_count || 0;
+
+      document.getElementById('modal-detail').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('modal-detail').classList.add('hidden');
+      window.selectedAsp = null;
+    }
+
+    // Admin Authentication & Panel
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const input = document.getElementById('admin-password-input').value;
+      if (input === ADMIN_PASSWORD) {
+        window.isAdminLoggedIn = true;
+        document.getElementById('admin-lock').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+        renderAdminTable();
+        showToast('Berhasil masuk sebagai Admin MPK!');
+      } else {
+        showToast('Kata sandi admin salah!');
+      }
+    }
+
+    function adminLogout() {
+      window.isAdminLoggedIn = false;
+      document.getElementById('admin-lock').classList.remove('hidden');
+      document.getElementById('admin-panel').classList.add('hidden');
+      document.getElementById('admin-password-input').value = '';
+    }
+
+    function renderAdminTable() {
+      if (!window.isAdminLoggedIn) return;
+      const container = document.getElementById('admin-table-container');
+      const all = window.aspirations || [];
+
+      if (all.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 text-sm">Belum ada data aspirasi.</div>`;
+        return;
+      }
+
+      container.innerHTML = all.map((item) => {
+        const badgeColor = item.status === 'published' ? 'bg-emerald-100 text-emerald-800' :
+          item.status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800';
+
+        return `
+          <div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50">
+            <div class="space-y-1 max-w-2xl">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${badgeColor}">
+                  ${item.status}
+                </span>
+                <span class="text-xs text-slate-400">• ${item.display_name}</span>
+              </div>
+              <h4 class="font-bold text-slate-800 text-base">${item.title}</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">${item.content}</p>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              ${item.status !== 'published' ? `
+                <button onclick="handleUpdateStatus('${item.id}', 'published')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm">
+                  Setujui
+                </button>
+              ` : ''}
+
+              ${item.status !== 'rejected' ? `
+                <button onclick="handleUpdateStatus('${item.id}', 'rejected')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm">
+                  Tolak
+                </button>
+              ` : ''}
+
+              <button onclick="handleDeleteAspiration('${item.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-rose-600 rounded-lg font-bold text-xs flex items-center gap-1 border border-slate-200">
+                Hapus
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
