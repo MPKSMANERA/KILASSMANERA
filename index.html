@@ -857,15 +857,14 @@
     window.userReactions = {};
 
     // 1. Firebase Initialization
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-      apiKey: "demo-api-key",
-      authDomain: "demo.firebaseapp.com",
-      projectId: "demo-project",
-      storageBucket: "demo.appspot.com",
-      messagingSenderId: "123456789",
-      appId: "1:123456789:web:demo"
-    };
-
+const firebaseConfig = {
+  apiKey: "AIzaSyAnuQE1aiwgyrP221Kt1ehsD7NErvcIhP4",
+  authDomain: "kilas-1a18b.firebaseapp.com",
+  projectId: "kilas-1a18b",
+  storageBucket: "kilas-1a18b.firebasestorage.app",
+  messagingSenderId: "667555823541",
+  appId: "1:667555823541:web:932b83b73a52fb3a8ae3fc"
+};
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
